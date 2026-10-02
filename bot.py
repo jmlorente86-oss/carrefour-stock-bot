@@ -50,8 +50,11 @@ def check_stock(url):
 def monitor():
     print("🚀 MONITOR DE CARREFOUR INICIADO")
 
-    bot = Bot(TOKEN)
+    print("📱 Creando bot de Telegram...")
+bot = Bot(TOKEN)
+print("✅ Bot de Telegram creado")
     previous_status = {}
+print("✅ Monitor preparado")
 
     while True:
         print("🔎 Comprobando stock...")
