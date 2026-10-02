@@ -87,7 +87,6 @@ def check_stock(url):
                 f"{response.status_code}"
             )
 
-            # Carrefour está bloqueando la petición
             if response.status_code == 403:
 
                 if intento < 3:
@@ -137,7 +136,7 @@ def check_stock(url):
 
 
 # =========================
-# ENVIAR TELEGRAM
+# TELEGRAM
 # =========================
 
 async def send_telegram_message(text):
@@ -184,4 +183,57 @@ def monitor():
 
         print("🔎 Comprobando stock...")
 
-        for name, url in
+        for name, url in PRODUCTS.items():
+
+            try:
+
+                available = check_stock(url)
+
+                if available:
+
+                    print(
+                        f"🟢 {name}: POSIBLE STOCK"
+                    )
+
+                else:
+
+                    print(
+                        f"🔴 {name}: SIN STOCK"
+                    )
+
+                if (
+                    available
+                    and previous_status.get(name) is False
+                ):
+
+                    send_alert(
+                        "🚨 ¡STOCK DETECTADO!\n\n"
+                        f"{name}\n\n"
+                        f"{url}"
+                    )
+
+                previous_status[name] = available
+
+            except Exception as e:
+
+                print(
+                    f"❌ Error comprobando "
+                    f"{name}: {e}"
+                )
+
+        print("⏳ Esperando 5 minutos...")
+
+        time.sleep(300)
+
+
+# =========================
+# ARRANCAR MONITOR
+# =========================
+
+threading.Thread(
+    target=monitor,
+    daemon=True
+).start()
+
+
+
