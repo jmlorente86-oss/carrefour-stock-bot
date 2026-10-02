@@ -51,16 +51,16 @@ def monitor():
     print("🚀 MONITOR DE CARREFOUR INICIADO")
 
     print("📱 Creando bot de Telegram...")
-bot = Bot(TOKEN)
-print("✅ Bot de Telegram creado")
+    bot = Bot(TOKEN)
+    print("✅ Bot de Telegram creado")
+
     previous_status = {}
-print("✅ Monitor preparado")
+    print("✅ Monitor preparado")
 
     while True:
         print("🔎 Comprobando stock...")
 
         for name, url in PRODUCTS.items():
-
             try:
                 available = check_stock(url)
 
@@ -82,15 +82,12 @@ print("✅ Monitor preparado")
                 previous_status[name] = available
 
             except Exception as e:
-                print(
-                    f"❌ Error comprobando {name}: {e}"
-                )
+                print(f"❌ Error comprobando {name}: {e}")
 
         print("⏳ Esperando 5 minutos...")
         time.sleep(300)
 
 
-# Iniciar monitor
 threading.Thread(
     target=monitor,
     daemon=True
