@@ -16,47 +16,79 @@ PRODUCTS = {
 
 app = Flask(__name__)
 
+
 @app.route("/")
 def home():
     return "Bot de stock Carrefour funcionando ✅"
 
+
 def check_stock(url):
     headers = {"User-Agent": "Mozilla/5.0"}
-    response = requests.get(url, headers=headers, timeout=20)
+
+    response = requests.get(
+        url,
+        headers=headers,
+        timeout=20
+    )
+
     response.raise_for_status()
 
     text = BeautifulSoup(
-        response.text, "html.parser"
+        response.text,
+        "html.parser"
     ).get_text(" ", strip=True).lower()
 
-    unavailable = ["agotado", "sin stock", "no disponible"]
+    unavailable = [
+        "agotado",
+        "sin stock",
+        "no disponible"
+    ]
 
     return not any(word in text for word in unavailable)
 
 
 def monitor():
+    print("🚀 MONITOR DE CARREFOUR INICIADO")
+
     bot = Bot(TOKEN)
     previous_status = {}
 
     while True:
+        print("🔎 Comprobando stock...")
+
         for name, url in PRODUCTS.items():
+
             try:
                 available = check_stock(url)
 
-                print(f"{name}: {'STOCK' if available else 'SIN STOCK'}")
+                print(
+                    f"{name}: "
+                    f"{'🟢 STOCK' if available else '🔴 SIN STOCK'}"
+                )
 
                 if available and previous_status.get(name) is False:
                     bot.send_message(
                         chat_id=CHAT_ID,
-                        text=f"🚨 ¡STOCK DETECTADO!\n\n{name}\n\n{url}"
+                        text=(
+                            f"🚨 ¡STOCK DETECTADO!\n\n"
+                            f"{name}\n\n"
+                            f"{url}"
+                        )
                     )
 
                 previous_status[name] = available
 
             except Exception as e:
-                print(f"Error comprobando {name}: {e}")
+                print(
+                    f"❌ Error comprobando {name}: {e}"
+                )
 
+        print("⏳ Esperando 5 minutos...")
         time.sleep(300)
 
 
-threading.Thread(target=monitor, daemon=True).start()
+# Iniciar monitor
+threading.Thread(
+    target=monitor,
+    daemon=True
+).start()
